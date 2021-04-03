@@ -22,7 +22,11 @@ export const COURSE_DATA = [
     id: "c1",
     title: "Ionic + react",
     enrolled: new Date("12/24/2019"),
-    goals: [{ id: "c1g1", text: "Finish the course" }],
+    goals: [
+      { id: "c1g1", text: "Finish the course" },
+      { id: "c1g2", text: "Study Hard" },
+      { id: "c1g3", text: "Final considerations" },
+    ],
   },
   {
     id: "c2",
