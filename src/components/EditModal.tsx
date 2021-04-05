@@ -30,12 +30,8 @@ const EditModal: React.FC<{
 
   return (
     <React.Fragment>
-      <IonModal   isOpen={props.show}>
-       
-
-
-
-	   <IonHeader>
+      <IonModal isOpen={props.show}>
+        <IonHeader>
           <IonToolbar>
             <IonTitle>
               {props.editedGoal

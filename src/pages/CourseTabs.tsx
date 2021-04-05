@@ -17,7 +17,7 @@ const CourseTabs: React.FC = () => {
   return (
     <IonTabs>
       <IonRouterOutlet>
-        <Redirect path="/courses" to="/courses/list" exact />
+        <Redirect path="/courses" to="/courses/all-goals" exact />
         <Switch>
           {/* Garantisce che una sola route sia attiva */}
           <Route path="/courses/list" exact>

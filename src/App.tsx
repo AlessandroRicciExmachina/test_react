@@ -37,35 +37,11 @@ import "./theme/variables.css";
 
 import Filter from "./pages/Filter";
 import CourseTabs from "./pages/CourseTabs";
-
+import SideDrawer from "./components/SideDrawer";
 const App: React.FC = () => (
   <IonApp>
     <IonReactRouter>
-      <IonMenu contentId="main" swipeGesture={false}>
-        <IonHeader>
-          <IonToolbar>
-            <IonTitle>Course Goal</IonTitle>
-          </IonToolbar>
-        </IonHeader>
-        <IonContent>
-          <IonList>
-            <IonMenuToggle>
-              <IonItem
-                button
-                routerLink="/courses/all-goals"
-                routerDirection="none"
-              >
-                <IonIcon slot="start" icon={list} />
-                <IonItem>All goals</IonItem>
-              </IonItem>
-              <IonItem button routerLink="/filter" routerDirection="none">
-                <IonIcon slot="start" icon={options} />
-                <IonItem>Filter</IonItem>
-              </IonItem>
-            </IonMenuToggle>
-          </IonList>
-        </IonContent>
-      </IonMenu>
+      <SideDrawer />
       <IonRouterOutlet id="main">
         <Route path="/filter" exact>
           <Filter />

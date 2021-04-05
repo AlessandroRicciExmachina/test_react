@@ -6,12 +6,7 @@ import {
   IonPage,
   IonBackButton,
   IonButtons,
-  IonItem,
   IonList,
-  IonLabel,
-  IonItemOption,
-  IonItemOptions,
-  IonItemSliding,
   IonIcon,
   IonButton,
   IonFab,
@@ -22,11 +17,11 @@ import {
 } from "@ionic/react";
 import { trash, createOutline, addOutline } from "ionicons/icons";
 
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { useParams } from "react-router-dom";
 import { COURSE_DATA } from "./Courses";
 import EditModal from "../components/EditModal";
-
+import EditableGoalItem from "../components/EditableGoalItem";
 interface goalType {
   id: string;
   text: string;
@@ -36,9 +31,8 @@ const CourseGoal: React.FC = () => {
   const [startedDeletion, setStartedDeletion] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
   const [isEditing, setIsEditing] = useState(false);
-
   const [selectedGoal, setSelectedGoal] = useState<any>(null);
-
+  const slidingOptionRef = useRef<HTMLIonItemSlidingElement>(null);
   //NOTE: se usi 1 va modificato anche la prop editedGoal in editModal
   //   1) const [selectedGoal, setSelectedGoal] = useState<goalType|null>(null);
   //   2) const [selectedGoal, setSelectedGoal] = useState<{
@@ -59,9 +53,10 @@ const CourseGoal: React.FC = () => {
     console.log("delete");
     setToastMessage("Deleated goal");
   };
-  const startEditGoalHandler = (goalId: string, event: React.MouseEvent) => {
+  const startEditGoalHandler = (event: React.MouseEvent, goalId: string) => {
     event.stopPropagation();
     const goal = selecteedCourse!.goals.find((g) => g.id === goalId);
+    slidingOptionRef.current?.closeOpened();
     if (!goal) {
       return false;
     }
@@ -71,8 +66,8 @@ const CourseGoal: React.FC = () => {
   const cancelEditGoalHandler = () => {
     setIsEditing(false);
     setSelectedGoal(null);
+    slidingOptionRef.current?.closeOpened();
   };
-  const swipeHandler = (event: CustomEvent, side: string) => {};
 
   const startAddGoalHandler = () => {
     console.log("startAddGoalHandler");
@@ -97,7 +92,10 @@ const CourseGoal: React.FC = () => {
       />
       <IonAlert
         isOpen={startedDeletion}
-        onDidDismiss={() => setStartedDeletion(false)}
+        onDidDismiss={() => {
+          setStartedDeletion(false);
+          slidingOptionRef.current?.closeOpened();
+        }}
         backdropDismiss={false}
         header={"Attenzione!"}
         message={"Vuoi davvero cancellare questa voce?"}
@@ -135,41 +133,14 @@ const CourseGoal: React.FC = () => {
         <IonContent>
           {selecteedCourse && (
             <IonList className="ion-no-padding">
-              {selecteedCourse.goals.map((goal) => (
-                <IonItemSliding key={goal.id}>
-                  <IonItemOptions side="start">
-                    <IonItemOption
-                      color="danger"
-                      expandable
-                      onClick={startDeleteGoalHandler}
-                    >
-                      <IonIcon slot="icon-only" icon={trash} />
-                      Delete
-                    </IonItemOption>
-                  </IonItemOptions>
-                  <IonItem lines="full">
-                    <IonLabel>{goal.text}</IonLabel>
-                  </IonItem>
-                  <IonItemOptions
-                    side="end"
-                    onIonSwipe={(event) => {
-                      swipeHandler(event, "right");
-                    }}
-                  >
-                    <IonItemOption
-                      color="tertiary"
-                      expandable
-                      //   onClick={(event) => {
-                      //     startEditGoal(event, +goal.id);
-                      //   }}
-                      ////! nella funzione bind l'evento sta sempre come primo parametro
-                      onClick={startEditGoalHandler.bind(null, goal.id)}
-                    >
-                      <IonIcon slot="icon-only" icon={createOutline} />
-                      Edit
-                    </IonItemOption>
-                  </IonItemOptions>
-                </IonItemSliding>
+              {selecteedCourse.goals.map((goal, i) => (
+                <EditableGoalItem
+                  key={i}
+                  slidingRef={slidingOptionRef}
+                  text={goal.text}
+                  onStartDelete={startDeleteGoalHandler}
+                  onStartEdit={(event) => startEditGoalHandler(event, goal.id)}
+                />
               ))}
             </IonList>
           )}
