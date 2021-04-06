@@ -26,15 +26,7 @@ const EditableGoalItem: React.FC<{
         <IonLabel>{props.text}</IonLabel>
       </IonItem>
       <IonItemOptions side="end">
-        <IonItemOption
-          color="tertiary"
-          expandable
-          //   onClick={(event) => {
-          //     startEditGoal(event, +goal.id);
-          //   }}
-          ////! nella funzione bind l'evento sta sempre come primo parametro
-          onClick={props.onStartEdit}
-        >
+        <IonItemOption color="tertiary" expandable onClick={props.onStartEdit}>
           <IonIcon slot="icon-only" icon={createOutline} />
           Edit
         </IonItemOption>

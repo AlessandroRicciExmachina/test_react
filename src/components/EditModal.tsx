@@ -12,9 +12,10 @@ import {
   IonItem,
   IonLabel,
   IonList,
+  IonText,
 } from "@ionic/react";
 import { parentPort } from "node:worker_threads";
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 interface goalType {
   id: string;
   text: string;
@@ -25,8 +26,21 @@ const EditModal: React.FC<{
   //   editedGoal: goalType | null;
   //   editedGoal: any;
   editedGoal: { id: string; text: string } | null;
+  onSave: (goalText: string) => void;
 }> = (props) => {
   const [text, setText] = useState<string>();
+  const [error, setError] = useState<string>("");
+
+  const textRef = useRef<HTMLIonInputElement>(null);
+  const saveHandler = () => {
+    const enteredText = textRef.current!.value;
+    if (!enteredText) {
+      setError("Please enter valid text");
+      return 0;
+    }
+    props.onSave(enteredText.toString());
+    props.onCancel();
+  };
 
   return (
     <React.Fragment>
@@ -42,6 +56,16 @@ const EditModal: React.FC<{
         </IonHeader>
         <IonContent>
           <IonGrid>
+            {error ? (
+              <IonRow>
+                <IonCol>
+                  <IonText>{error}</IonText>
+                </IonCol>
+              </IonRow>
+            ) : (
+              ""
+            )}
+
             <IonRow>
               <IonCol>
                 <IonList>
@@ -50,6 +74,7 @@ const EditModal: React.FC<{
                     <IonInput
                       type="text"
                       value={props.editedGoal?.text}
+                      ref={textRef}
                     ></IonInput>
                   </IonItem>
                 </IonList>
@@ -62,7 +87,7 @@ const EditModal: React.FC<{
                 </IonButton>
               </IonCol>
               <IonCol>
-                <IonButton fill="solid" color="secondary">
+                <IonButton fill="solid" color="secondary" onClick={saveHandler}>
                   Save
                 </IonButton>
               </IonCol>

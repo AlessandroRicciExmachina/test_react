@@ -14,12 +14,13 @@ import {
   isPlatform,
   IonAlert,
   IonToast,
+  IonText,
 } from "@ionic/react";
 import { trash, createOutline, addOutline } from "ionicons/icons";
 
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useContext } from "react";
 import { useParams } from "react-router-dom";
-import { COURSE_DATA } from "./Courses";
+import CoursesContext from "../data/courses-context";
 import EditModal from "../components/EditModal";
 import EditableGoalItem from "../components/EditableGoalItem";
 interface goalType {
@@ -28,6 +29,8 @@ interface goalType {
 }
 
 const CourseGoal: React.FC = () => {
+  const courseCtx = useContext(CoursesContext);
+  const [goalIdToDeleteUpdate, setGoalIdToDeleteUpdate] = useState<string>("");
   const [startedDeletion, setStartedDeletion] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
   const [isEditing, setIsEditing] = useState(false);
@@ -41,20 +44,22 @@ const CourseGoal: React.FC = () => {
   //   } | null>(null);
   //   3) const [selectedGoal, setSelectedGoal] = useState<any>(null);
   const selectedCourseId = useParams<{ courseId: string }>().courseId;
-  const selecteedCourse = COURSE_DATA.find(
+  const selecteedCourse = courseCtx.courses.find(
     (course) => course.id === selectedCourseId
   );
 
-  const startDeleteGoalHandler = (event: React.MouseEvent) => {
-    event.stopPropagation();
+  const startDeleteGoalHandler = (event: React.MouseEvent, goalId: string) => {
     setStartedDeletion(true);
+    setGoalIdToDeleteUpdate(goalId);
   };
   const deleteGoalHandler = () => {
-    console.log("delete");
+    courseCtx.deleteGoal(selectedCourseId, goalIdToDeleteUpdate);
     setToastMessage("Deleated goal");
+    setGoalIdToDeleteUpdate("");
   };
   const startEditGoalHandler = (event: React.MouseEvent, goalId: string) => {
     event.stopPropagation();
+    setGoalIdToDeleteUpdate(goalId);
     const goal = selecteedCourse!.goals.find((g) => g.id === goalId);
     slidingOptionRef.current?.closeOpened();
     if (!goal) {
@@ -74,6 +79,15 @@ const CourseGoal: React.FC = () => {
     setIsEditing(true);
   };
 
+  const saveGoalHandler = (text: string) => {
+    if (goalIdToDeleteUpdate) {
+      courseCtx.updateGoal(selectedCourseId, goalIdToDeleteUpdate, text);
+      setGoalIdToDeleteUpdate("");
+    } else {
+      courseCtx.addGoal(selectedCourseId, text);
+    }
+    setIsEditing(false);
+  };
   return (
     <React.Fragment>
       {
@@ -81,6 +95,7 @@ const CourseGoal: React.FC = () => {
           show={isEditing}
           onCancel={cancelEditGoalHandler}
           editedGoal={selectedGoal}
+          onSave={saveGoalHandler}
         />
       }
       <IonToast
@@ -138,7 +153,9 @@ const CourseGoal: React.FC = () => {
                   key={i}
                   slidingRef={slidingOptionRef}
                   text={goal.text}
-                  onStartDelete={startDeleteGoalHandler}
+                  onStartDelete={(event) => {
+                    startDeleteGoalHandler(event, goal.id);
+                  }}
                   onStartEdit={(event) => startEditGoalHandler(event, goal.id)}
                 />
               ))}

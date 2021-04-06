@@ -11,21 +11,24 @@ import {
   IonTitle,
   IonToolbar,
 } from "@ionic/react";
-import React from "react";
-import { COURSE_DATA } from "./Courses";
+import React, { useContext } from "react";
+import CoursesContext from "../data/courses-context";
 
 const AllGoals: React.FC = () => {
-  const goals = COURSE_DATA.map((course) => {
-    return course.goals.map((goal) => {
-      return { ...goal, courseTitle: course.title };
-    });
-  }).reduce((accumulator, currentValue) => {
-    let container = accumulator;
-    for (const goal of currentValue) {
-      container.push(goal);
-    }
-    return container;
-  }, []);
+  const courseCtx = useContext(CoursesContext);
+  const goals = courseCtx.courses
+    .map((course) => {
+      return course.goals.map((goal) => {
+        return { ...goal, courseTitle: course.title };
+      });
+    })
+    .reduce((accumulator, currentValue) => {
+      let container = accumulator;
+      for (const goal of currentValue) {
+        container.push(goal);
+      }
+      return container;
+    }, []);
 
   console.log(goals);
 

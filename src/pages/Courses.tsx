@@ -12,36 +12,13 @@ import {
   IonToolbar,
 } from "@ionic/react";
 import { add } from "ionicons/icons";
-import React, { useState } from "react";
-import AddGoalModal from "../components/AddCourseModal";
+import React, { useState, useContext } from "react";
+import AddCourseModal from "../components/AddCourseModal";
 import CourseItem from "../components/CourseItem";
-
-export const COURSE_DATA = [
-  {
-    id: "c1",
-    title: "Ionic + react",
-    enrolled: new Date("12/24/2019"),
-    goals: [
-      { id: "c1g1", text: "Finish the course" },
-      { id: "c1g2", text: "Study Hard" },
-      { id: "c1g3", text: "Final considerations" },
-    ],
-  },
-  {
-    id: "c2",
-    title: "react JS guide",
-    enrolled: new Date("12/02/2019"),
-    goals: [{ id: "c2g1", text: "Finish the course c3" }],
-  },
-  {
-    id: "c3",
-    title: "JavascriptS guide",
-    enrolled: new Date("05/09/2019"),
-    goals: [{ id: "c3g1", text: "Finish the course c3" }],
-  },
-];
+import CoursesContext from "../data/courses-context";
 
 const Courses: React.FC = () => {
+  const courseCtx = useContext(CoursesContext);
   const [showCourseModal, setCourseModal] = useState(false);
   const [editCourse, setEditCouse] = useState<{
     id: string;
@@ -50,7 +27,9 @@ const Courses: React.FC = () => {
     goals: { id: string; text: string }[];
   } | null>(null);
   const setEditCouseHandler = (course: string) => {
-    let courseToHandle = COURSE_DATA.filter((corso) => corso.id === course);
+    let courseToHandle = courseCtx.courses.filter(
+      (corso) => corso.id === course
+    );
     const courseToHandleElement = courseToHandle[0];
     setEditCouse(courseToHandleElement);
     setCourseModal(true);
@@ -59,12 +38,17 @@ const Courses: React.FC = () => {
     setCourseModal(false);
   };
 
+  const courseHandler = (title: string, date: Date) => {
+    courseCtx.addCourse(title, date);
+  };
+
   return (
     <React.Fragment>
-      <AddGoalModal
+      <AddCourseModal
         show={showCourseModal}
         closeModal={setCloseModal}
         editCourse={editCourse}
+        onSave={courseHandler}
       />
       <IonPage>
         <IonHeader>
@@ -74,7 +58,7 @@ const Courses: React.FC = () => {
         </IonHeader>
         <IonContent>
           <IonGrid>
-            {COURSE_DATA.map((course) => {
+            {courseCtx.courses.map((course) => {
               return (
                 <IonRow key={course.id}>
                   <IonCol size-md="4" offset-md="4">
